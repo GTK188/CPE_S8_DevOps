@@ -42,7 +42,7 @@ jobs:
         with:
           # relative path to the place where source code with Dockerfile is located
           context: ./simple-api-student
-          dockerfile: java.dockerfile
+          file: java.dockerfile
           # Note: tags has to be all lower-case
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp2-devops-simple-api:latest
           # build on feature branches, push only on main branch
@@ -52,7 +52,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./db
-          dockerfile: db.dockerfile
+          file: db.dockerfile
 
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp2-devops-database:latest
           push: ${{ github.ref == 'refs/heads/main' }}
@@ -61,7 +61,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./web
-          dockerfile: front.dockerfile
+          file: front.dockerfile
 
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp2-devops-front:latest
           push: ${{ github.ref == 'refs/heads/main' }}
