@@ -7,6 +7,9 @@ To build and run the application from the root folder:
 Testcontainers are lightweight libraries with an API for completing integration test with services inside containers
 
 ## CI
+First, we create our environment variable in the repo:
+![Secret list](Secret_list.png)
+
 main.yml:
 ```yaml
 name: CI devops 2023
