@@ -27,6 +27,7 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
+        #precise java version & distribution (Eclipse Temurin, Oracle JDK, ...)
           java-version: 17
           distribution: 'temurin'
 
