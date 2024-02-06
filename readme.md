@@ -99,3 +99,97 @@ run: mvn -B verify sonar:sonar -Dsonar.projectKey=GTK188_CPE_S8_DevOps -Dsonar.o
 
 A SonarCloud analysis report should appear:
 ![SonarCloud report](Sonar_result.png)
+
+## Split pipeline
+I separate the workflow into 2 files:
+- One that test the backend:
+```yml
+name: Test backend
+
+on:
+  #to begin you want to launch this job in main and develop
+  push:
+    branches: [main, develop] 
+
+jobs:
+  test-backend: 
+    runs-on: ubuntu-22.04
+    steps:
+     #checkout your github code using actions/checkout@v2.5.0
+      - uses: actions/checkout@v2.5.0
+
+     #do the same with another action (actions/setup-java@v3) that enable to setup jdk 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+     #finally build your app with the latest command
+      - name: Build and test with Maven
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=GTK188_CPE_S8_DevOps -Dsonar.organization=gtk188 -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}  --file ./simple-api-student/pom.xml
+```
+
+- And one for the build & push of docker images :
+```yml
+name: Build and push docker image
+
+on:
+  workflow_run:
+    workflows:
+      - Test backend
+    types:
+      - completed 
+    branches:
+      - main
+
+jobs:
+  # define job to build and publish docker image
+  build-and-push-docker-image:
+    runs-on: ubuntu-22.04
+
+    # steps to perform in job
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.5.0
+
+      - name: Login to DockerHub
+        run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build image and push backend
+        uses: docker/build-push-action@v3
+        with:
+          # relative path to the place where source code with Dockerfile is located
+          context: ./simple-api-student
+          # Note: tags has to be all lower-case
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp2-devops-simple-api:latest
+          # build on feature branches, push only on main branch
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push database
+        uses: docker/build-push-action@v3
+        with:
+          context: ./db
+
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp2-devops-database:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push httpd
+        uses: docker/build-push-action@v3
+        with:
+          context: ./web
+
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp2-devops-front:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
+```
+
+Using this code, we ensure that the second workflow starts only if the first workflow is completed on the main branch:
+```yml
+workflow_run:
+  workflows:
+    - Test backend
+  types:
+    - completed 
+  branches:
+    - main
+```
