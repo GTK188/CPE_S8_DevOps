@@ -5,7 +5,6 @@ services:
       container_name: backend
       build:
         context: ./simple-api-student
-        dockerfile: java.dockerfile
       networks:
         - my-network
       depends_on:
@@ -15,7 +14,6 @@ services:
       container_name: database
       build:
         context: ./db
-        dockerfile: db.dockerfile
       volumes:
         - db:/var/lib/postgresql/data
       networks:
@@ -25,7 +23,6 @@ services:
       container_name: frontend
       build:
         context: ./web
-        dockerfile: front.dockerfile
       ports:
         - '80:80'
       networks:
