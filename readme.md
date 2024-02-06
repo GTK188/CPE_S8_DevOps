@@ -85,3 +85,13 @@ steps:
 
 We test the workflow again in github actions:
 ![Workflow CD success](CD_test_good.png)
+
+# Sonar
+After creating the organisation on SonarCloud, you edit the build and test job in the workflow file:
+
+```yml
+run: mvn -B verify sonar:sonar -Dsonar.projectKey=GTK188_CPE_S8_DevOps -Dsonar.organization=gtk188 -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}  --file ./simple-api-student/pom.xml
+```
+
+A SonarCloud analysis report should appear:
+![SonarCloud report](Sonar_result.png)
