@@ -873,7 +873,7 @@ Don't forget to add the role in ```playbook.yml```:
     - launch-front
 ```
 
-Then we can execute the playbook, we can see that our 4 containers are up and working and the website is working as intended:
+Then we can execute the playbook with ```ansible-playbook -i inventories/setup.yml playbook.yml```, we can see that our 4 containers are up and working and the website is working as intended:
 ![Front_docker_list](Front_docker_list.png)
 ![Front_web_result](Front_web_result.png)
 

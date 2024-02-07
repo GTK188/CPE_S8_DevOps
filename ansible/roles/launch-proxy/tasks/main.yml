@@ -1,0 +1,13 @@
+---
+# tasks file for roles/launch-proxy
+- name: Run Proxy
+  docker_container:
+    name: frontend
+    image: gtk188/tp2-devops-front:latest
+    pull: true
+    recreate: true
+    networks:
+      - name: network
+    ports:
+      - "80:80"
+      - "8080:8080"

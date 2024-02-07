@@ -1,0 +1,12 @@
+all:
+ vars:
+   ansible_user: centos
+   ansible_ssh_private_key_file: ../id_rsa
+
+   POSTGRES_DB: "db"
+   POSTGRES_USER: "usr"
+   POSTGRES_PASSWORD: "pwd"
+   POSTGRES_HOST: "database:5432"
+ children:
+   prod:
+     hosts: loan.aubry.takima.cloud

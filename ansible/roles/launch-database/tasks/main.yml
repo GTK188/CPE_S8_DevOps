@@ -1,0 +1,20 @@
+---
+# tasks file for roles/launch-database
+- name: Create Volume
+  docker_volume:
+    name: db
+    state: present
+
+- name: Launch Database
+  docker_container:
+    name: database
+    image: gtk188/tp2-devops-database:latest
+    networks:
+      - name: network
+    volumes:
+      - db:/var/lib/postgresql/data
+    env:
+      password: "{{ POSTGRES_PASSWORD }}"
+      username: "{{ POSTGRES_USER }}"
+      db: "{{ POSTGRES_DB }}"
+      url: "{{ POSTGRES_HOST }}"

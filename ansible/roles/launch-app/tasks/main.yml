@@ -1,0 +1,13 @@
+---
+# tasks file for roles/launch-app
+- name: Launch App
+  docker_container:
+    name: backend
+    image: gtk188/tp2-devops-simple-api:latest
+    networks:
+      - name: network
+    env:
+      PASSWORD: "{{ POSTGRES_PASSWORD }}"
+      USERNAME: "{{ POSTGRES_USER }}"
+      DB: "{{ POSTGRES_DB }}"
+      URL: "{{ POSTGRES_HOST }}"
