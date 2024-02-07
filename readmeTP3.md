@@ -281,3 +281,103 @@ gtk@GTK-HPENVY:~/devops$ tree
             └── vars
                 └── main.yml
 ```
+You'll then need to edit/create the following files:
+
+- ```ansible/inventories/setup.yml```
+```yml
+all:
+ vars:
+   ansible_user: centos
+   ansible_ssh_private_key_file: ~/id_rsa
+
+   POSTGRES_DB: "db"
+   POSTGRES_USER: "usr"
+   POSTGRES_PASSWORD: "pwd"
+   POSTGRES_HOST: "database:5432"
+ children:
+   prod:
+     hosts: loan.aubry.takima.cloud
+```
+
+- ```ansible/roles/create-network/tasks/main.yml```
+```yml
+---
+# tasks file for roles/create-network
+- name: Create network
+  docker_network:
+    name: network
+    state: present
+```
+
+- ```ansible/roles/install-docker/tasks/main.yml```
+Same as the one in roles/docker
+
+- ```ansible/roles/launch-app/tasks/main.yml```
+```yml
+---
+# tasks file for roles/launch-app
+- name: Launch App
+  docker_container:
+    name: backend
+    image: gtk188/tp2-devops-simple-api
+    networks:
+      - name: network
+    env:
+      PASSWORD: "{{ POSTGRES_PASSWORD }}"
+      USERNAME: "{{ POSTGRES_USER }}"
+      DB: "{{ POSTGRES_DB }}"
+      URL: "{{ POSTGRES_HOST }}"
+```
+
+- ```ansible/roles/launch-database/tasks/main.yml```
+```yml
+---
+# tasks file for roles/launch-database
+- name: Create Volume
+  docker_volume:
+    name: db
+    state: present
+
+- name: Launch Database
+  docker_container:
+    name: database
+    image: gtk188/tp2-devops-database
+    networks:
+      - name: network
+    volumes:
+      - db:/var/lib/postgresql/data
+    env:
+      password: "{{ POSTGRES_PASSWORD }}"
+      username: "{{ POSTGRES_USER }}"
+      db: "{{ POSTGRES_DB }}"
+      url: "{{ POSTGRES_HOST }}"
+```
+
+- ```ansible/roles/launch-proxy/tasks/main.yml```
+```yml
+---
+# tasks file for roles/launch-proxy
+- name: Run HTTPD
+  docker_container:
+    name: frontend
+    image: gtk188/tp2-devops-front
+    networks:
+      - name: network
+    ports:
+      - "80:80"
+```
+
+I've created variables in the inventory to be used in launch-database and launch-app so it's easier when credentials change.
+
+In launch-database, I've created a volume to be used in the container.
+
+In launch-proxy, I've opened the 80 port so you can access to the frontend.
+
+Then we execute our playbook and we can see in the server that the containers are here and working:
+![Deploy_docker_ps](Deploy_docker_ps.png)
+
+And that the API is working as intended:
+![Deploy_api_results](Deploy_api_results.png)
+
+## Front
+

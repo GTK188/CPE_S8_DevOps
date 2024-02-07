@@ -5,6 +5,8 @@ services:
       container_name: backend
       build:
         context: ./simple-api-student
+      ports:
+        - '8080:8080'
       networks:
         - my-network
       depends_on:
@@ -34,6 +36,17 @@ services:
         context: ./web
       ports:
         - '80:80'
+      networks:
+        - my-network
+      depends_on:
+        - backend
+
+    front-main:
+      container_name: front-main
+      build:
+        context: ./devops-front-main
+      ports:
+        - '88:80'
       networks:
         - my-network
       depends_on:
