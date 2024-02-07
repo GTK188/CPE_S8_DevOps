@@ -21,6 +21,14 @@ jobs:
       - name: Install Python + Pip + Ansible
         run: sudo apt install python3-pip && sudo apt install ansible
 
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{secrets.SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
+          chmod 600 ~/,ssh/id_rsa
+        env:
+          SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
+
       - name: Deploy application
         run: ansible-playbook -i ./ansible/inventories/setup.yml ./ansible/playbook.yml
 
