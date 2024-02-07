@@ -10,10 +10,10 @@ services:
       depends_on:
         - database
       environments:
-        - POSTGRES_DB=db
-        - POSTGRES_USER=usr
-        - POSTGRES_PASSWORD=pwd
-        - POSTGRES_HOST="database:5432"
+        - URL=database:5432
+        - USERNAME=usr
+        - PASSWORD=pwd
+        - DB=db
 
     database:
       container_name: database
