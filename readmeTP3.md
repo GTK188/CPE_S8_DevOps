@@ -319,7 +319,7 @@ Same as the one in roles/docker
 - name: Launch App
   docker_container:
     name: backend
-    image: gtk188/tp2-devops-simple-api
+    image: gtk188/tp2-devops-simple-api:latest
     networks:
       - name: network
     env:
@@ -341,7 +341,7 @@ Same as the one in roles/docker
 - name: Launch Database
   docker_container:
     name: database
-    image: gtk188/tp2-devops-database
+    image: gtk188/tp2-devops-database:latest
     networks:
       - name: network
     volumes:
@@ -360,7 +360,7 @@ Same as the one in roles/docker
 - name: Run HTTPD
   docker_container:
     name: frontend
-    image: gtk188/tp2-devops-front
+    image: gtk188/tp2-devops-front:latest
     networks:
       - name: network
     ports:
