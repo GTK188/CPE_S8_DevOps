@@ -13,7 +13,7 @@ services:
         - POSTGRES_DB=db
         - POSTGRES_USER=usr
         - POSTGRES_PASSWORD=pwd
-        - POSTGRES_HOST=database:5432
+        - POSTGRES_HOST="database:5432"
 
     database:
       container_name: database
