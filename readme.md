@@ -879,4 +879,66 @@ Then we can execute the playbook with ```ansible-playbook -i inventories/setup.y
 
 ## Continuous Deployment
 
+To add ansible to CD, we'll first add this code to ```docker-compose.yml```:
+```yml
+    front-main:
+      container_name: front-main
+      build:
+        context: ./devops-front-main
+      ports:
+        - '88:80'
+      networks:
+        - my-network
+      depends_on:
+        - backend
+```
+
+Then, we'll create a new worflow file called ```ansible_deploy.yml```:
+```yml
+name: Deploy application to ansible
+
+on:
+  workflow_run:
+    workflows:
+      - Build and push docker image
+    types:
+      - completed 
+    branches:
+      - main
+
+jobs:
+  deploy-to-ansible:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.5.0
+
+      - name: Install Python + Pip + Ansible
+        run: sudo apt install python3-pip && sudo apt install ansible
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H loan.aubry.takima.cloud >> ~/.ssh/known_hosts
+          echo "${{secrets.SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+        env:
+          SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
+
+      - name: Deploy application
+        run: ansible-playbook -i ./ansible/inventories/setup.yml ./ansible/playbook.yml
+```
+
+I've created a secret variable containing the ssh private key.
+The ```ssh-keyscan``` command put the server address as a known host so that the playbook can work as intended.
+
+I've also changed the private key var in ```./ansible/inventories/setup.yml```:
+```yml
+   ansible_ssh_private_key_file: ~/.ssh/id_rsa
+```
+
+You can now deploy the application into the server automaticaly with Github Actions:
+![Deploy_ansible_results](Deploy_ansible_results.png)
 
