@@ -24,11 +24,9 @@ jobs:
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
+          ssh-keyscan -H loan.aubry.takima.cloud >> ~/.ssh/known_hosts
           echo "${{secrets.SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ls ~
-          ls ~/.ssh
-          cat ~/.ssh/id_rsa
         env:
           SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
 
