@@ -942,3 +942,27 @@ I've also changed the private key var in ```./ansible/inventories/setup.yml```:
 You can now deploy the application into the server automaticaly with Github Actions:
 ![Deploy_ansible_results](Deploy_ansible_results.png)
 
+To use ansible-vault for data encryption, we need to edit the "Setup SSH key" & "Deploy application" steps on our workflow:
+```yml
+  - name: Run playbook
+    uses: dawidd6/action-ansible-playbook@v2
+    with:
+      playbook: ./ansible/playbook.yml
+      key: ${{secrets.SSH_PRIVATE_KEY}}
+      inventory: |
+        all:
+          vars:
+            ansible_user: centos
+        
+            POSTGRES_DB: "db"
+            POSTGRES_USER: "usr"
+            POSTGRES_PASSWORD: "pwd"
+            POSTGRES_HOST: "database:5432"
+          children:
+            prod:
+              hosts: loan.aubry.takima.cloud
+        
+      known_hosts: |
+        loan.aubry.takima.cloud ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDC2hWAsMZi3X4zpt3m23MlGa1hcCs5RUB73bRpHvBHI
+      vault_password: ${{secrets.ANSIBLE_VAULT_PASSWORD}}
+```
