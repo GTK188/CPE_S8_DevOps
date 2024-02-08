@@ -25,10 +25,12 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H loan.aubry.takima.cloud >> ~/.ssh/known_hosts
-          echo "${{secrets.SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
+          echo "${{secrets.ANSIBLE_VAULT_PASSWORD}}" > ~/.ssh/vault_password
+          echo "ansible-vault encrypt ${{secrets.SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
         env:
           SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
+          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
 
       - name: Deploy application
         run: ansible-playbook -i ./ansible/inventories/setup.yml ./ansible/playbook.yml
