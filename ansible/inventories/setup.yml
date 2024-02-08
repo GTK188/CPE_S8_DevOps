@@ -1,7 +1,7 @@
 all:
  vars:
    ansible_user: centos
-   ansible_ssh_private_key_file: ansible-vault decrypt ~/.ssh/id_rsa --vault-password-file ~/.ssh/vault_password
+   ansible_ssh_private_key_file: ~/.ssh/id_rsa
 
    POSTGRES_DB: "db"
    POSTGRES_USER: "usr"

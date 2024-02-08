@@ -21,17 +21,24 @@ jobs:
       - name: Install Python + Pip + Ansible
         run: sudo apt install python3-pip && sudo apt install ansible
 
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H loan.aubry.takima.cloud >> ~/.ssh/known_hosts
-          echo "$ANSIBLE_VAULT_PASSWORD" > ~/.ssh/vault_password
-          echo "ansible-vault encrypt $SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-        env:
-          SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
-          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
-
-      - name: Deploy application
-        run: ansible-playbook -i ./ansible/inventories/setup.yml ./ansible/playbook.yml
-
+      - name: Run playbook
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: ./ansible/playbook.yml
+          key: ${{secrets.SSH_PRIVATE_KEY}}
+          inventory: |
+            all:
+              vars:
+                ansible_user: centos
+            
+                POSTGRES_DB: "db"
+                POSTGRES_USER: "usr"
+                POSTGRES_PASSWORD: "pwd"
+                POSTGRES_HOST: "database:5432"
+              children:
+                prod:
+                  hosts: loan.aubry.takima.cloud
+           
+          known_hosts: |
+            loan.aubry.takima.cloud ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDC2hWAsMZi3X4zpt3m23MlGa1hcCs5RUB73bRpHvBHI
+          vault_password: ${{secrets.ANSIBLE_VAULT_PASSWORD}}
