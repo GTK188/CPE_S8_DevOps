@@ -26,7 +26,7 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H loan.aubry.takima.cloud >> ~/.ssh/known_hosts
           echo "$ANSIBLE_VAULT_PASSWORD" > ~/.ssh/vault_password
-          echo "ansible-vault encrypt $SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
         env:
           SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
